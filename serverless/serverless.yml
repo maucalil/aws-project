@@ -1,0 +1,70 @@
+service: serverless
+
+frameworkVersion: '2'
+
+custom:
+  imageUploadBucketName: training-image-upload
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  region: sa-east-1
+  memorySize: 256
+  stage: dev
+  iam:
+    role: 
+      statements:
+        - Effect: Allow
+          Action:
+            # - s3:*
+            - s3:GetObject
+            - s3:PutObject
+          Resource:
+            - "arn:aws:s3:::${self:custom.imageUploadBucketName}"
+            - "arn:aws:s3:::${self:custom.imageUploadBucketName}/*"
+
+# resources:
+#   Resources:
+#     ImageBucket:
+#       Type: AWS::S3::Bucket 
+#       Properties:
+#         BucketName: ${self:custom.imageUploadBucketName}
+#         AccesControl: PublicRead
+
+functions:
+  optmize:
+    handler: lambdas/optmize.handler
+    name: s3-image-optmizer
+    environment:
+      bucket: ${self:custom.imageUploadBucketName}
+    events:     
+      - s3:
+          bucket: ${self:custom.imageUploadBucketName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploads/
+            - suffix: .jpg   
+      - s3:
+          bucket: ${self:custom.imageUploadBucketName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploads/
+            - suffix: .png   
+      - s3:
+          bucket: ${self:custom.imageUploadBucketName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploads/
+            - suffix: .jpeg   
+  upload:
+    handler: lambdas/upload.handler
+    name: s3-image-uploader
+    timeout: 60 
+    environment:
+      bucket: ${self:custom.imageUploadBucketName}
+    events: 
+      - http:
+          path: images/upload
+          method: POST
+          cors: true 
