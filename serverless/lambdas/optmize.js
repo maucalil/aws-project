@@ -40,6 +40,7 @@ module.exports.handler = async ({ Records: records }, context) => {
         }).promise();
 
         response.body = JSON.stringify({ message: "Succesfully optmized image to S3", optmizeResult: optmizeResult } );
+        console.log(response);
       })
     );
   } catch (err) {

@@ -83,6 +83,12 @@
         "LogGroupName": "/aws/lambda/s3-image-uploader"
       }
     },
+    "GetLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/s3-image-get"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -129,6 +135,9 @@
                     },
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/s3-image-uploader:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/s3-image-get:*"
                     }
                   ]
                 },
@@ -143,14 +152,16 @@
                     },
                     {
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/s3-image-uploader:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/s3-image-get:*:*"
                     }
                   ]
                 },
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject"
+                    "s3:*"
                   ],
                   "Resource": [
                     "arn:aws:s3:::training-image-upload",
@@ -184,7 +195,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless/dev/1634756483778-2021-10-20T19:01:23.778Z/serverless.zip"
+          "S3Key": "serverless/serverless/dev/1634920494892-2021-10-22T16:34:54.892Z/serverless.zip"
         },
         "Handler": "lambdas/optmize.handler",
         "Runtime": "nodejs12.x",
@@ -214,13 +225,13 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless/dev/1634756483778-2021-10-20T19:01:23.778Z/serverless.zip"
+          "S3Key": "serverless/serverless/dev/1634920494892-2021-10-22T16:34:54.892Z/serverless.zip"
         },
         "Handler": "lambdas/upload.handler",
         "Runtime": "nodejs12.x",
         "FunctionName": "s3-image-uploader",
         "MemorySize": 256,
-        "Timeout": 60,
+        "Timeout": 6,
         "Environment": {
           "Variables": {
             "bucket": "training-image-upload"
@@ -237,24 +248,64 @@
         "UploadLogGroup"
       ]
     },
-    "OptmizeLambdaVersionOsqslkyJtd397IeHW4ekRiDOoF8radLECeBntyB4txQ": {
+    "GetLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/serverless/dev/1634920494892-2021-10-22T16:34:54.892Z/serverless.zip"
+        },
+        "Handler": "lambdas/get.handler",
+        "Runtime": "nodejs12.x",
+        "FunctionName": "s3-image-get",
+        "MemorySize": 256,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "bucket": "training-image-upload"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "GetLogGroup"
+      ]
+    },
+    "OptmizeLambdaVersionpSiALTrRHS5rsidUEMI422rPGj8UJJaRDoYGmaFeI": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "OptmizeLambdaFunction"
         },
-        "CodeSha256": "L3mC53pY0WTWdGl+cB1e7CFX+K+d63jBT+VrFGuoQZU="
+        "CodeSha256": "YwxzN7tB9Hfi1BdAEuHXtvYU+5l7jxnIHYpPduNP3Sc="
       }
     },
-    "UploadLambdaVersionYHJ0hOS3CwwCUGvn2DxIKiOZOD2i3rZqvlwDP5YHGU": {
+    "UploadLambdaVersion7yzrI8MBm9rgSsjE6mMmSylcfLk4wjWhInOFzcMPA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "UploadLambdaFunction"
         },
-        "CodeSha256": "L3mC53pY0WTWdGl+cB1e7CFX+K+d63jBT+VrFGuoQZU="
+        "CodeSha256": "YwxzN7tB9Hfi1BdAEuHXtvYU+5l7jxnIHYpPduNP3Sc="
+      }
+    },
+    "GetLambdaVersionIrdjBi1RBka419ajNGqcQshuaBanwCQ1gOZ3RSs3Y": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetLambdaFunction"
+        },
+        "CodeSha256": "YwxzN7tB9Hfi1BdAEuHXtvYU+5l7jxnIHYpPduNP3Sc="
       }
     },
     "S3BucketTrainingimageupload": {
@@ -381,7 +432,7 @@
         "Policy": ""
       }
     },
-    "ApiGatewayResourceImages": {
+    "ApiGatewayResourceImage": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
@@ -390,17 +441,17 @@
             "RootResourceId"
           ]
         },
-        "PathPart": "images",
+        "PathPart": "image",
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
       }
     },
-    "ApiGatewayResourceImagesUpload": {
+    "ApiGatewayResourceImageUpload": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
-          "Ref": "ApiGatewayResourceImages"
+          "Ref": "ApiGatewayResourceImage"
         },
         "PathPart": "upload",
         "RestApiId": {
@@ -408,7 +459,19 @@
         }
       }
     },
-    "ApiGatewayMethodImagesUploadOptions": {
+    "ApiGatewayResourceImageKeyVar": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceImage"
+        },
+        "PathPart": "{key}",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodImageUploadOptions": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "AuthorizationType": "NONE",
@@ -446,20 +509,65 @@
           ]
         },
         "ResourceId": {
-          "Ref": "ApiGatewayResourceImagesUpload"
+          "Ref": "ApiGatewayResourceImageUpload"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         }
       }
     },
-    "ApiGatewayMethodImagesUploadPost": {
+    "ApiGatewayMethodImageKeyVarOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceImageKeyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodImageUploadPost": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "HttpMethod": "POST",
         "RequestParameters": {},
         "ResourceId": {
-          "Ref": "ApiGatewayResourceImagesUpload"
+          "Ref": "ApiGatewayResourceImageUpload"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -499,7 +607,53 @@
         "UploadLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1634756480971": {
+    "ApiGatewayMethodImageKeyVarGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceImageKeyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "GetLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "GetLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayDeployment1634920492012": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -508,8 +662,10 @@
         "StageName": "dev"
       },
       "DependsOn": [
-        "ApiGatewayMethodImagesUploadOptions",
-        "ApiGatewayMethodImagesUploadPost"
+        "ApiGatewayMethodImageUploadOptions",
+        "ApiGatewayMethodImageKeyVarOptions",
+        "ApiGatewayMethodImageUploadPost",
+        "ApiGatewayMethodImageKeyVarGet"
       ]
     },
     "UploadLambdaPermissionApiGateway": {
@@ -518,6 +674,43 @@
         "FunctionName": {
           "Fn::GetAtt": [
             "UploadLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "GetLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetLambdaFunction",
             "Arn"
           ]
         },
@@ -562,7 +755,7 @@
     "OptmizeLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "OptmizeLambdaVersionOsqslkyJtd397IeHW4ekRiDOoF8radLECeBntyB4txQ"
+        "Ref": "OptmizeLambdaVersionpSiALTrRHS5rsidUEMI422rPGj8UJJaRDoYGmaFeI"
       },
       "Export": {
         "Name": "sls-serverless-dev-OptmizeLambdaFunctionQualifiedArn"
@@ -571,10 +764,19 @@
     "UploadLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "UploadLambdaVersionYHJ0hOS3CwwCUGvn2DxIKiOZOD2i3rZqvlwDP5YHGU"
+        "Ref": "UploadLambdaVersion7yzrI8MBm9rgSsjE6mMmSylcfLk4wjWhInOFzcMPA"
       },
       "Export": {
         "Name": "sls-serverless-dev-UploadLambdaFunctionQualifiedArn"
+      }
+    },
+    "GetLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetLambdaVersionIrdjBi1RBka419ajNGqcQshuaBanwCQ1gOZ3RSs3Y"
+      },
+      "Export": {
+        "Name": "sls-serverless-dev-GetLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {

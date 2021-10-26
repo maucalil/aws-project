@@ -32,6 +32,7 @@ module.exports.handler = async (event) => {
         const uploadResult = await s3.upload(params).promise();
 
         response.body = JSON.stringify({ message: "Succesfully uploaded image to S3", uploadResult });
+        console.log(response);
     } catch (err) {
         console.error("Erro:", err);
         response.body = JSON.stringify({ message: "Failed to upload image to S3:", err });

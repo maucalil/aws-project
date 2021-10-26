@@ -13,6 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "parse-multipart": "^1.0.4",
-    "sharp": "^0.29.1"
+    "sharp": "^0.29.2"
   }
 }
